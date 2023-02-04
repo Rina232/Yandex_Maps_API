@@ -18,7 +18,12 @@ params = {
 map_file = "map.png"
 
 
-def file_update(params):
+def file_update(ZOOM, LON, LAT):
+    params = {
+        "ll": ",".join([LON, LAT]),
+        "z": ZOOM,
+        "l": "map"
+    }
     response = requests.get(api_server, params=params)
 
     if not response:
@@ -31,7 +36,7 @@ def file_update(params):
         file.write(response.content)
 
 
-file_update(params)
+file_update(ZOOM, LON, LAT)
 
 
 pygame.init()
@@ -45,13 +50,14 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                if params['z'] < 23:
-                    params['z'] += 1
-            if event.key == pygame.K_DOWN:
-                if params['z'] > 0:
-                    params['z'] -= 1
-    file_update(params)
+            if event.key == pygame.K_PAGEUP:
+                if ZOOM < 23:
+                    ZOOM += 1
+                    file_update(ZOOM, LON, LAT)
+            if event.key == pygame.K_PAGEDOWN:
+                if ZOOM > 0:
+                    ZOOM -= 1
+                    file_update(ZOOM, LON, LAT)
     screen.blit(pygame.image.load(map_file), (0, 0))
     pygame.display.flip()
 
